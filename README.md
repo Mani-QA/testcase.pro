@@ -13,13 +13,68 @@ A production-ready Test Case Management System built with Hono, Cloudflare Worke
 
 ## Tech Stack
 
-- **Runtime**: Cloudflare Workers (Edge)
-- **Framework**: Hono
-- **Database**: Cloudflare D1 (SQLite)
-- **ORM**: Drizzle ORM
-- **Styling**: Tailwind CSS
-- **Interactivity**: HTMX + Alpine.js
-- **Charts**: Chart.js
+### Runtime: Cloudflare Workers (Edge)
+**Why we chose it:**
+- **Global Edge Deployment**: Code runs in 300+ data centers worldwide, ensuring ultra-low latency (<50ms) for users regardless of location
+- **Zero Cold Starts**: Unlike traditional serverless (AWS Lambda), Workers have near-instant startup times (~0ms cold start)
+- **Cost Effective**: Pay only for compute time with generous free tier (100,000 requests/day free)
+- **Built-in Security**: Automatic DDoS protection, SSL/TLS, and isolated V8 execution environment
+- **Simplified DevOps**: No server management, auto-scaling, or infrastructure maintenance required
+
+### Framework: Hono
+**Why we chose it:**
+- **Ultralight & Fast**: Only 14KB in size, designed specifically for edge runtimes with exceptional performance
+- **Edge-First Design**: Built from the ground up for Cloudflare Workers, Deno, and Bun
+- **Familiar API**: Express-like routing syntax makes migration and onboarding seamless
+- **Built-in JSX Support**: Server-side rendering with JSX without needing React, reducing bundle size
+- **TypeScript Native**: First-class TypeScript support with excellent type inference
+- **Middleware Ecosystem**: Rich set of built-in middleware for auth, CORS, compression, and more
+
+### Database: Cloudflare D1 (SQLite)
+**Why we chose it:**
+- **Edge-Native SQL**: SQLite database that runs at the edge, co-located with Workers for minimal latency
+- **Zero Configuration**: No connection strings, connection pooling, or database server management
+- **Familiar SQL**: Full SQLite compatibility means standard SQL queries and easy migration
+- **Cost Efficient**: Generous free tier with pay-as-you-go pricing for production workloads
+- **Automatic Backups**: Built-in point-in-time recovery and disaster protection
+- **Global Replication**: Data automatically replicated for high availability
+
+### ORM: Drizzle ORM
+**Why we chose it:**
+- **Type-Safe Queries**: Full TypeScript inference from schema to query results prevents runtime errors
+- **SQL-Like Syntax**: Queries read like SQL, making debugging and optimization intuitive
+- **Lightweight**: No heavy runtime dependencies, perfect for edge environments with size constraints
+- **D1 Integration**: First-class Cloudflare D1 support with optimized drivers
+- **Schema Migrations**: Built-in migration system with SQL file generation for version control
+- **Zero Overhead**: Generates optimal SQL without N+1 query problems
+
+### Styling: Tailwind CSS
+**Why we chose it:**
+- **Utility-First**: Rapid UI development without context-switching to separate CSS files
+- **Production Optimized**: PurgeCSS removes unused styles, resulting in tiny CSS bundles (~10KB)
+- **Consistent Design System**: Built-in spacing, color, and typography scales ensure visual consistency
+- **Responsive by Default**: Mobile-first breakpoints (`sm:`, `md:`, `lg:`) built into every utility
+- **No CSS Conflicts**: Scoped utilities eliminate specificity wars and cascade issues
+- **IDE Support**: Excellent IntelliSense with autocomplete for all utilities
+
+### Interactivity: HTMX + Alpine.js
+**Why we chose it:**
+- **No Build Step Required**: Both libraries work via CDN with zero compilation needed
+- **HTML-Centric**: Enhances HTML with attributes rather than replacing it with JavaScript frameworks
+- **Minimal JavaScript**: Achieve SPA-like experiences with 90% less client-side JavaScript
+- **HTMX for AJAX**: Declarative HTTP requests (`hx-get`, `hx-post`) for dynamic content loading
+- **Alpine.js for State**: Lightweight reactivity (`x-data`, `x-show`, `x-on`) for UI interactions
+- **Progressive Enhancement**: Works without JavaScript, enhanced experience when available
+- **Tiny Footprint**: Combined ~25KB vs React (~45KB) + React-DOM (~120KB)
+
+### Charts: Chart.js
+**Why we chose it:**
+- **Canvas-Based Rendering**: Smooth animations and high performance with HTML5 Canvas
+- **Responsive by Default**: Charts automatically resize to container dimensions
+- **8 Chart Types**: Bar, line, pie, doughnut, radar, polar, bubble, and scatter charts included
+- **Highly Customizable**: Extensive configuration options for colors, fonts, tooltips, and legends
+- **Active Community**: Well-maintained with extensive documentation and plugins ecosystem
+- **Accessibility**: Built-in ARIA support for screen readers and keyboard navigation
 
 ## Prerequisites
 
