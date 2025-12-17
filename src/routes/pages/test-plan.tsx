@@ -89,29 +89,94 @@ export async function testPlanPage(c: Context<{ Bindings: Bindings }>) {
   
   return c.html(
     <Layout user={user} currentPath="/test-plan" title="Test Plan">
-      <div class="flex h-full">
+      <div class="flex flex-col lg:flex-row h-full" x-data="{ folderPanelOpen: false }">
+        {/* Mobile Folder Toggle Button */}
+        <div class="lg:hidden sticky top-0 z-30 bg-white border-b border-neutral-200 p-3">
+          <button
+            type="button"
+            x-on:click="folderPanelOpen = !folderPanelOpen"
+            class="flex items-center gap-2 px-4 py-2.5 bg-neutral-100 hover:bg-neutral-200 rounded-lg text-sm font-medium text-neutral-700 w-full justify-between transition-colors"
+          >
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+              </svg>
+              <span>{selectedFolderId ? allFolders.find(f => f.id === selectedFolderId)?.name || 'Selected Folder' : 'All Folders'}</span>
+            </div>
+            <svg 
+              class="w-5 h-5 transition-transform" 
+              x-bind:class="folderPanelOpen ? 'rotate-180' : ''"
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Mobile Folder Panel Overlay */}
+        <div 
+          x-show="folderPanelOpen" 
+          x-transition:enter="transition-opacity ease-out duration-200"
+          x-transition:enter-start="opacity-0"
+          x-transition:enter-end="opacity-100"
+          x-transition:leave="transition-opacity ease-in duration-150"
+          x-transition:leave-start="opacity-100"
+          x-transition:leave-end="opacity-0"
+          class="lg:hidden fixed inset-0 z-40 bg-black/40"
+          x-on:click="folderPanelOpen = false"
+          style="display: none;"
+        />
+
         {/* Sidebar - Folder Tree */}
-        <div class="w-80 bg-white border-r border-neutral-200 p-4 overflow-y-auto scrollbar-thin">
-          <div class="mb-4">
-            <h2 class="text-lg font-semibold text-neutral-900 mb-2">Folders</h2>
-            <p class="text-sm text-neutral-600">Organize your test cases</p>
+        <div 
+          class="fixed lg:static inset-x-0 bottom-0 z-50 lg:z-auto lg:w-80 bg-white border-t lg:border-t-0 lg:border-r border-neutral-200 max-h-[70vh] lg:max-h-none overflow-y-auto scrollbar-thin rounded-t-2xl lg:rounded-none shadow-strong lg:shadow-none transform transition-transform duration-300 ease-out lg:transform-none"
+          x-bind:class="folderPanelOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'"
+          style="display: none;"
+          x-bind:style="'display: block;'"
+        >
+          {/* Mobile drag handle */}
+          <div class="lg:hidden sticky top-0 bg-white pt-3 pb-2 px-4 border-b border-neutral-100">
+            <div class="w-10 h-1 bg-neutral-300 rounded-full mx-auto mb-2" />
+            <div class="flex items-center justify-between">
+              <h2 class="text-base font-semibold text-neutral-900">Folders</h2>
+              <button 
+                type="button"
+                x-on:click="folderPanelOpen = false"
+                class="p-1.5 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-lg"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
           </div>
-          
-          <FolderTree
-            folders={allFolders}
-            selectedFolderId={selectedFolderId}
-            canEdit={canEdit}
-          />
+
+          <div class="p-4">
+            <div class="mb-4 hidden lg:block">
+              <h2 class="text-lg font-semibold text-neutral-900 mb-2">Folders</h2>
+              <p class="text-sm text-neutral-600">Organize your test cases</p>
+            </div>
+            
+            <div x-on:click="folderPanelOpen = false">
+              <FolderTree
+                folders={allFolders}
+                selectedFolderId={selectedFolderId}
+                canEdit={canEdit}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Main Content - Test Cases */}
-        <div class="flex-1 overflow-y-auto p-8">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <div class="max-w-7xl mx-auto">
             {/* Header */}
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
               <div>
-                <h1 class="text-3xl font-bold text-neutral-900 mb-2">Test Plan</h1>
-                <p class="text-neutral-600">
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 mb-1 sm:mb-2">Test Plan</h1>
+                <p class="text-sm sm:text-base text-neutral-600">
                   {selectedFolderId 
                     ? `${testCasesWithDetails.length} test case(s) in this folder`
                     : `${testCasesWithDetails.length} total test case(s)`
@@ -119,7 +184,8 @@ export async function testPlanPage(c: Context<{ Bindings: Bindings }>) {
                 </p>
               </div>
               
-              <div class="flex gap-3">
+              {/* Desktop Actions */}
+              <div class="hidden sm:flex gap-2 sm:gap-3">
                 <Button
                   variant="ghost"
                   icon={icons.download}
@@ -146,18 +212,47 @@ export async function testPlanPage(c: Context<{ Bindings: Bindings }>) {
                   </>
                 )}
               </div>
+
+              {/* Mobile Actions - Icon buttons */}
+              <div class="flex sm:hidden gap-2">
+                <a 
+                  href={selectedFolderId ? `/api/test-cases/export?folderId=${selectedFolderId}` : '/api/test-cases/export'}
+                  class="flex items-center justify-center w-10 h-10 bg-neutral-100 hover:bg-neutral-200 rounded-lg text-neutral-600 transition-colors"
+                  title="Export CSV"
+                >
+                  <span dangerouslySetInnerHTML={{ __html: icons.download }} />
+                </a>
+                {canEdit && (
+                  <>
+                    <a 
+                      href="/test-plan/import"
+                      class="flex items-center justify-center w-10 h-10 bg-neutral-100 hover:bg-neutral-200 rounded-lg text-neutral-600 transition-colors"
+                      title="Import CSV"
+                    >
+                      <span dangerouslySetInnerHTML={{ __html: icons.upload }} />
+                    </a>
+                    <a 
+                      href={`/test-case/new${selectedFolderId ? `?folderId=${selectedFolderId}` : ''}`}
+                      class="flex items-center justify-center gap-2 px-4 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg text-white font-medium text-sm transition-colors"
+                    >
+                      <span dangerouslySetInnerHTML={{ __html: icons.plus }} />
+                      <span>New Test Case</span>
+                    </a>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Test Cases Grid */}
             <div id="test-cases-list">
               {testCasesWithDetails.length === 0 ? (
                 <Card>
-                  <div class="text-center py-12">
+                  <div class="text-center py-8 sm:py-12">
                     <span dangerouslySetInnerHTML={{ __html: icons.folder }} class="mx-auto mb-4" />
-                    <h3 class="text-lg font-semibold text-neutral-900 mb-2">
+                    <h3 class="text-base sm:text-lg font-semibold text-neutral-900 mb-2">
                       No test cases yet
                     </h3>
-                    <p class="text-neutral-600 mb-6">
+                    <p class="text-sm sm:text-base text-neutral-600 mb-4 sm:mb-6">
                       {canEdit
                         ? 'Create your first test case to get started'
                         : 'Sign in to create test cases'
@@ -175,7 +270,7 @@ export async function testPlanPage(c: Context<{ Bindings: Bindings }>) {
                   </div>
                 </Card>
               ) : (
-                <div class="grid gap-4">
+                <div class="grid gap-3 sm:gap-4">
                   {testCasesWithDetails.map((testCase) => (
                     <TestCaseCard
                       key={testCase.id}

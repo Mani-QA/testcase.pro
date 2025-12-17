@@ -41,10 +41,10 @@ export const TestCaseCard: FC<TestCaseCardProps> = ({
   
   return (
     <Card padding={false}>
-      <div class="p-6">
+      <div class="p-4 sm:p-6">
         {/* Header row with ID and action buttons */}
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center gap-3">
+        <div class="flex items-start sm:items-center justify-between gap-2 mb-2">
+          <div class="flex items-center gap-2 sm:gap-3">
             {/* Checkbox (Select Mode) */}
             {selectMode && canEdit && (
               <button
@@ -58,7 +58,7 @@ export const TestCaseCard: FC<TestCaseCardProps> = ({
                       dangerouslySetInnerHTML={{ __html: isSelected ? icons.checkSquare : icons.square }} />
               </button>
             )}
-            <span class="text-sm font-mono text-primary-600">
+            <span class="text-xs sm:text-sm font-mono text-primary-600">
               {generateTestCaseId(testCase.id)}
             </span>
           </div>
@@ -66,28 +66,47 @@ export const TestCaseCard: FC<TestCaseCardProps> = ({
           {/* Action Buttons (Only when NOT in select mode) */}
           {!selectMode && canEdit && (
             <div class="flex gap-1 flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={icons.edit}
-                href={`/test-case/${testCase.id}/edit`}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={icons.delete}
-                onClick={`if(confirm('Are you sure you want to delete this test case?')) { htmx.ajax('DELETE', '/api/test-cases/${testCase.id}', {target: '#test-cases-list', swap: 'innerHTML'}); }`}
-              >
-                Delete
-              </Button>
+              {/* Desktop: Text buttons */}
+              <div class="hidden sm:flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={icons.edit}
+                  href={`/test-case/${testCase.id}/edit`}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={icons.delete}
+                  onClick={`if(confirm('Are you sure you want to delete this test case?')) { htmx.ajax('DELETE', '/api/test-cases/${testCase.id}', {target: '#test-cases-list', swap: 'innerHTML'}); }`}
+                >
+                  Delete
+                </Button>
+              </div>
+              {/* Mobile: Icon-only buttons */}
+              <div class="flex sm:hidden gap-1">
+                <a 
+                  href={`/test-case/${testCase.id}/edit`}
+                  class="p-2 text-neutral-500 hover:text-primary-600 hover:bg-neutral-100 rounded-lg transition-colors"
+                >
+                  <span dangerouslySetInnerHTML={{ __html: icons.edit }} />
+                </a>
+                <button
+                  type="button"
+                  class="p-2 text-neutral-500 hover:text-danger-600 hover:bg-danger-50 rounded-lg transition-colors"
+                  onClick={`if(confirm('Are you sure you want to delete this test case?')) { htmx.ajax('DELETE', '/api/test-cases/${testCase.id}', {target: '#test-cases-list', swap: 'innerHTML'}); }`}
+                >
+                  <span dangerouslySetInnerHTML={{ __html: icons.delete }} />
+                </button>
+              </div>
             </div>
           )}
         </div>
         
         {/* Title - Clickable to view test case */}
-        <h3 class="text-lg font-semibold mb-2">
+        <h3 class="text-base sm:text-lg font-semibold mb-1.5 sm:mb-2">
           <a 
             href={`/test-case/${testCase.id}`}
             class="text-neutral-900 hover:text-primary-600 transition-colors"
@@ -98,13 +117,13 @@ export const TestCaseCard: FC<TestCaseCardProps> = ({
         
         {/* Description */}
         {testCase.description && (
-          <p class="text-sm text-neutral-600 mb-3 line-clamp-2">
+          <p class="text-xs sm:text-sm text-neutral-600 mb-2 sm:mb-3 line-clamp-2">
             {testCase.description}
           </p>
         )}
         
         {/* Badges */}
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <Badge variant={priorityVariant}>
             {testCase.priority || 'Medium'}
           </Badge>
@@ -112,14 +131,20 @@ export const TestCaseCard: FC<TestCaseCardProps> = ({
           {testCase.isAutomated && (
             <Badge variant="info">Automated</Badge>
           )}
-          {testCase.tags?.map((tag: any) => (
+          {testCase.tags?.slice(0, 2).map((tag: any) => (
             <Badge key={tag.id} variant="neutral">{tag.name}</Badge>
           ))}
+          {testCase.tags && testCase.tags.length > 2 && (
+            <span class="text-xs text-neutral-500">+{testCase.tags.length - 2}</span>
+          )}
         </div>
         
-        <div class="text-xs text-neutral-500 pt-3 border-t border-neutral-100 mt-4">
-          Created {formatDate(testCase.createdAt)} 
-          {testCase.author && ` by ${testCase.author.fullName || testCase.author.email}`}
+        <div class="text-xs text-neutral-500 pt-2 sm:pt-3 border-t border-neutral-100 mt-3 sm:mt-4">
+          <span class="hidden sm:inline">Created {formatDate(testCase.createdAt)}</span>
+          <span class="sm:hidden">{formatDate(testCase.createdAt)}</span>
+          {testCase.author && (
+            <span class="hidden sm:inline"> by {testCase.author.fullName || testCase.author.email}</span>
+          )}
         </div>
       </div>
     </Card>

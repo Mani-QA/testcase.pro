@@ -24,6 +24,8 @@ const icons: Record<string, string> = {
   user: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>`,
   logout: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>`,
   login: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>`,
+  menu: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>`,
+  close: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`,
 };
 
 export const Layout: FC<LayoutProps> = ({ children, user, currentPath, title }) => {
@@ -39,12 +41,49 @@ export const Layout: FC<LayoutProps> = ({ children, user, currentPath, title }) 
         <script src="https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       </head>
-      <body class="bg-neutral-50">
+      <body class="bg-neutral-50" x-data="{ sidebarOpen: false }">
         <div class="flex h-screen">
+          {/* Mobile Header */}
+          <header class="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-neutral-200 shadow-soft">
+            <div class="flex items-center justify-between px-4 py-3">
+              <button 
+                type="button" 
+                x-on:click="sidebarOpen = true"
+                class="p-2 -ml-2 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+              >
+                <span dangerouslySetInnerHTML={{ __html: icons.menu }} />
+              </button>
+              <a href="/dashboard" class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-lg flex items-center justify-center shadow-soft">
+                  <span class="text-white scale-75" dangerouslySetInnerHTML={{ __html: icons.check }} />
+                </div>
+                <span class="font-bold text-neutral-900">TestCase Pro</span>
+              </a>
+              <div class="w-10" /> {/* Spacer for balance */}
+            </div>
+          </header>
+
+          {/* Mobile Sidebar Overlay */}
+          <div 
+            x-show="sidebarOpen" 
+            x-transition:enter="transition-opacity ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition-opacity ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="lg:hidden fixed inset-0 z-50 bg-black/50"
+            x-on:click="sidebarOpen = false"
+            style="display: none;"
+          />
+
           {/* Sidebar */}
-          <aside class="w-64 bg-white border-r border-neutral-200 flex flex-col shadow-soft">
+          <aside 
+            class="fixed lg:static inset-y-0 left-0 z-50 w-72 lg:w-64 bg-white border-r border-neutral-200 flex flex-col shadow-strong lg:shadow-soft transform transition-transform duration-300 ease-out lg:transform-none"
+            x-bind:class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+          >
             {/* Logo */}
-            <div class="p-6 border-b border-neutral-200">
+            <div class="p-6 border-b border-neutral-200 flex items-center justify-between">
               <a href="/dashboard" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-xl flex items-center justify-center shadow-medium group-hover:shadow-strong transition-shadow">
                   <span class="text-white" dangerouslySetInnerHTML={{ __html: icons.check }} />
@@ -54,6 +93,14 @@ export const Layout: FC<LayoutProps> = ({ children, user, currentPath, title }) 
                   <p class="text-xs text-neutral-500">QA Management</p>
                 </div>
               </a>
+              {/* Close button for mobile */}
+              <button 
+                type="button" 
+                x-on:click="sidebarOpen = false"
+                class="lg:hidden p-2 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors"
+              >
+                <span dangerouslySetInnerHTML={{ __html: icons.close }} />
+              </button>
             </div>
 
             {/* Navigation */}
@@ -64,6 +111,7 @@ export const Layout: FC<LayoutProps> = ({ children, user, currentPath, title }) 
                   <a
                     key={item.href}
                     href={item.href}
+                    x-on:click="sidebarOpen = false"
                     class={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all ${
                       isActive
                         ? 'bg-primary-50 text-primary-700 shadow-soft'
@@ -121,22 +169,45 @@ export const Layout: FC<LayoutProps> = ({ children, user, currentPath, title }) 
           </aside>
 
           {/* Main Content */}
-          <main class="flex-1 overflow-auto bg-neutral-50">
+          <main class="flex-1 overflow-auto bg-neutral-50 pt-14 pb-20 lg:pt-0 lg:pb-0">
             <div class="min-h-full">
               {children}
             </div>
           </main>
         </div>
 
+        {/* Mobile Bottom Navigation */}
+        <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-neutral-200 shadow-strong safe-area-bottom">
+          <div class="flex items-center justify-around py-2">
+            {navItems.map((item) => {
+              const isActive = currentPath === item.href || currentPath.startsWith(item.href + '/');
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  class={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-colors min-w-[64px] ${
+                    isActive
+                      ? 'text-primary-600'
+                      : 'text-neutral-500 hover:text-neutral-700'
+                  }`}
+                >
+                  <span dangerouslySetInnerHTML={{ __html: icons[item.icon] }} />
+                  <span class="text-xs font-medium">{item.label}</span>
+                </a>
+              );
+            })}
+          </div>
+        </nav>
+
         {/* Toast Container */}
-        <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+        <div id="toast-container" class="fixed top-16 lg:top-4 right-4 z-50 space-y-2"></div>
 
         {/* Toast Script */}
         <script dangerouslySetInnerHTML={{ __html: `
           window.showToast = function(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = 'toast-enter px-4 py-3 rounded-lg shadow-medium flex items-center gap-3 ' + 
+            toast.className = 'toast-enter px-4 py-3 rounded-lg shadow-medium flex items-center gap-3 max-w-xs ' + 
               (type === 'success' ? 'bg-white border-l-4 border-success-500' : 
                type === 'error' ? 'bg-white border-l-4 border-danger-500' : 'bg-white border-l-4 border-primary-500');
             toast.innerHTML = '<span class="text-sm text-neutral-900">' + message + '</span>';

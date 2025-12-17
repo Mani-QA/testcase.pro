@@ -78,31 +78,31 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
   
   return c.html(
     <Layout user={user} currentPath="/dashboard" title="Dashboard">
-      <div class="p-8 max-w-7xl mx-auto">
+      <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-neutral-900 mb-2">Dashboard</h1>
-          <p class="text-neutral-600">
+        <div class="mb-6 lg:mb-8">
+          <h1 class="text-2xl sm:text-3xl font-bold text-neutral-900 mb-1 sm:mb-2">Dashboard</h1>
+          <p class="text-sm sm:text-base text-neutral-600">
             Overview of your test case management system
           </p>
         </div>
 
         {/* Guest Mode Banner */}
         {!user && (
-          <Card className="mb-6 border-primary-200 bg-primary-50">
-            <div class="flex items-start gap-4">
-              <div class="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
-                <span class="text-primary-600" dangerouslySetInnerHTML={{ __html: icons.check }} />
+          <Card className="mb-4 sm:mb-6 border-primary-200 bg-primary-50">
+            <div class="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+              <div class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-primary-100 rounded-xl flex items-center justify-center">
+                <span class="text-primary-600 scale-75 sm:scale-100" dangerouslySetInnerHTML={{ __html: icons.check }} />
               </div>
               <div class="flex-1">
-                <h3 class="text-lg font-semibold text-primary-900 mb-2">
+                <h3 class="text-base sm:text-lg font-semibold text-primary-900 mb-1 sm:mb-2">
                   Welcome to TestCase Pro!
                 </h3>
-                <p class="text-primary-800 mb-4">
+                <p class="text-sm sm:text-base text-primary-800 mb-3 sm:mb-4">
                   You're currently in <strong>guest mode</strong>. You can browse test cases, view test runs, and explore reports. 
                   To create and manage test cases, please sign in.
                 </p>
-                <div class="flex gap-3">
+                <div class="flex flex-wrap gap-2 sm:gap-3">
                   <Button variant="primary" href="/auth/signin" icon={icons.login}>
                     Sign In
                   </Button>
@@ -115,18 +115,18 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
           </Card>
         )}
 
-        {/* Summary Cards */}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {summaryCards.map((card) => (
-            <Card key={card.title} padding={false}>
-              <div class="p-6">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-sm text-neutral-600 mb-1">{card.title}</p>
-                    <p class="text-3xl font-bold text-neutral-900">{card.value}</p>
+        {/* Summary Cards - 2 columns on mobile, 3 on desktop */}
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
+          {summaryCards.map((card, index) => (
+            <Card key={card.title} padding={false} className={index === 2 ? 'col-span-2 lg:col-span-1' : ''}>
+              <div class="p-4 sm:p-6">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="min-w-0">
+                    <p class="text-xs sm:text-sm text-neutral-600 mb-0.5 sm:mb-1 truncate">{card.title}</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-neutral-900">{card.value}</p>
                   </div>
-                  <div class={`w-14 h-14 bg-gradient-to-br ${card.color} rounded-xl flex items-center justify-center shadow-medium`}>
-                    <span dangerouslySetInnerHTML={{ __html: card.icon }} />
+                  <div class={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br ${card.color} rounded-lg sm:rounded-xl flex items-center justify-center shadow-medium`}>
+                    <span class="scale-75 sm:scale-100" dangerouslySetInnerHTML={{ __html: card.icon }} />
                   </div>
                 </div>
               </div>
@@ -134,16 +134,16 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
           ))}
         </div>
 
-        {/* Charts */}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Charts - Stacked on mobile */}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* Status Distribution */}
-          <Card title="Test Status Overview" subtitle="Distribution across active test runs">
+          <Card title="Test Status Overview" subtitle="Distribution by test results">
             {statusData.length > 0 ? (
               <div class="chart-container">
                 <canvas id="statusChart"></canvas>
               </div>
             ) : (
-              <div class="h-64 flex items-center justify-center text-neutral-500">
+              <div class="h-48 sm:h-64 flex items-center justify-center text-neutral-500 text-sm">
                 No test run data available
               </div>
             )}
@@ -156,7 +156,7 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
                 <canvas id="trendChart"></canvas>
               </div>
             ) : (
-              <div class="h-64 flex items-center justify-center text-neutral-500">
+              <div class="h-48 sm:h-64 flex items-center justify-center text-neutral-500 text-sm">
                 No execution trend data available
               </div>
             )}
@@ -165,15 +165,15 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
 
         {/* Welcome Message */}
         {stats.totalTestCases === 0 && (
-          <Card className="mt-6">
-            <div class="text-center py-8">
-              <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span class="text-primary-600" dangerouslySetInnerHTML={{ __html: icons.trend }} />
+          <Card className="mt-4 lg:mt-6">
+            <div class="text-center py-6 sm:py-8">
+              <div class="w-12 h-12 sm:w-16 sm:h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <span class="text-primary-600 scale-75 sm:scale-100" dangerouslySetInnerHTML={{ __html: icons.trend }} />
               </div>
-              <h3 class="text-xl font-semibold text-neutral-900 mb-2">
+              <h3 class="text-lg sm:text-xl font-semibold text-neutral-900 mb-2">
                 Welcome to TestCase Pro!
               </h3>
-              <p class="text-neutral-600 mb-6 max-w-md mx-auto">
+              <p class="text-sm sm:text-base text-neutral-600 mb-4 sm:mb-6 max-w-md mx-auto px-4">
                 Get started by creating your first test case in the Test Plan section.
               </p>
             </div>

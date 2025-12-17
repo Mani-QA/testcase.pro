@@ -155,48 +155,52 @@ export async function reportsPage(c: Context<{ Bindings: Bindings }>) {
   
   return c.html(
     <Layout user={user} currentPath="/reports" title="Reports">
-      <div class="p-8 max-w-7xl mx-auto">
+      <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6 lg:mb-8">
           <div>
-            <h1 class="text-3xl font-bold text-neutral-900 mb-2">Reports</h1>
-            <p class="text-neutral-600">Analytics and insights from your test execution</p>
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 mb-1 sm:mb-2">Reports</h1>
+            <p class="text-sm sm:text-base text-neutral-600">Analytics and insights from your test execution</p>
           </div>
-          <Button variant="primary" icon={icons.download} href={exportUrl}>
-            Export CSV
-          </Button>
+          <a
+            href={exportUrl}
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg shadow-soft transition-colors flex-shrink-0"
+          >
+            <span dangerouslySetInnerHTML={{ __html: icons.download }} />
+            <span>Export CSV</span>
+          </a>
         </div>
         
-        {/* Summary Stats */}
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Summary Stats - 2x2 grid on mobile, 4 cols on desktop */}
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
           <Card>
-            <div class="text-center">
-              <p class="text-4xl font-bold text-primary-600">{Number(testCaseCount?.count || 0)}</p>
-              <p class="text-sm text-neutral-600 mt-1">Total Test Cases</p>
+            <div class="text-center py-1 sm:py-0">
+              <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-600">{Number(testCaseCount?.count || 0)}</p>
+              <p class="text-xs sm:text-sm text-neutral-600 mt-0.5 sm:mt-1">Total Test Cases</p>
             </div>
           </Card>
           <Card>
-            <div class="text-center">
-              <p class="text-4xl font-bold text-secondary-600">{Number(testSuiteCount?.count || 0)}</p>
-              <p class="text-sm text-neutral-600 mt-1">Test Suites</p>
+            <div class="text-center py-1 sm:py-0">
+              <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary-600">{Number(testSuiteCount?.count || 0)}</p>
+              <p class="text-xs sm:text-sm text-neutral-600 mt-0.5 sm:mt-1">Test Suites</p>
             </div>
           </Card>
           <Card>
-            <div class="text-center">
-              <p class="text-4xl font-bold text-neutral-900">{Number(testRunCount?.count || 0)}</p>
-              <p class="text-sm text-neutral-600 mt-1">Total Executions</p>
+            <div class="text-center py-1 sm:py-0">
+              <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">{Number(testRunCount?.count || 0)}</p>
+              <p class="text-xs sm:text-sm text-neutral-600 mt-0.5 sm:mt-1">Total Executions</p>
             </div>
           </Card>
           <Card>
-            <div class="text-center">
-              <p class="text-4xl font-bold text-success-600">{overallPassRate}%</p>
-              <p class="text-sm text-neutral-600 mt-1">Overall Pass Rate</p>
+            <div class="text-center py-1 sm:py-0">
+              <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-success-600">{overallPassRate}%</p>
+              <p class="text-xs sm:text-sm text-neutral-600 mt-0.5 sm:mt-1">Overall Pass Rate</p>
             </div>
           </Card>
         </div>
         
-        {/* Charts Row */}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Charts Row - stacked on mobile */}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8">
           {/* Status Distribution */}
           <Card title="Execution Status" subtitle="Distribution of test results">
             {statusData.length > 0 ? (
@@ -204,7 +208,7 @@ export async function reportsPage(c: Context<{ Bindings: Bindings }>) {
                 <canvas id="statusPieChart"></canvas>
               </div>
             ) : (
-              <div class="h-64 flex items-center justify-center text-neutral-500">
+              <div class="h-48 sm:h-64 flex items-center justify-center text-sm text-neutral-500">
                 No execution data available
               </div>
             )}
@@ -217,7 +221,7 @@ export async function reportsPage(c: Context<{ Bindings: Bindings }>) {
                 <canvas id="priorityChart"></canvas>
               </div>
             ) : (
-              <div class="h-64 flex items-center justify-center text-neutral-500">
+              <div class="h-48 sm:h-64 flex items-center justify-center text-sm text-neutral-500">
                 No test case data available
               </div>
             )}
@@ -225,7 +229,7 @@ export async function reportsPage(c: Context<{ Bindings: Bindings }>) {
         </div>
         
         {/* Trend and Suite Performance */}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8">
           {/* Execution Trend */}
           <Card title="Execution Trend" subtitle="Daily test executions (last 30 days)">
             {trendData.length > 0 ? (
@@ -233,7 +237,7 @@ export async function reportsPage(c: Context<{ Bindings: Bindings }>) {
                 <canvas id="trendLineChart"></canvas>
               </div>
             ) : (
-              <div class="h-64 flex items-center justify-center text-neutral-500">
+              <div class="h-48 sm:h-64 flex items-center justify-center text-sm text-neutral-500">
                 No trend data available
               </div>
             )}
@@ -242,29 +246,29 @@ export async function reportsPage(c: Context<{ Bindings: Bindings }>) {
           {/* Suite Performance */}
           <Card title="Suite Performance" subtitle="Pass rates for recent test suites">
             {suiteStats.length > 0 ? (
-              <div class="space-y-4">
+              <div class="space-y-3 sm:space-y-4">
                 {suiteStats.map((suite, index) => (
-                  <div key={index} class="flex items-center gap-4">
+                  <div key={index} class="flex items-center gap-2 sm:gap-4">
                     <div class="flex-1 min-w-0">
-                      <p class="text-sm font-medium text-neutral-900 truncate">{suite.name}</p>
-                      <p class="text-xs text-neutral-500">{suite.passed} of {suite.total} passed</p>
+                      <p class="text-xs sm:text-sm font-medium text-neutral-900 truncate">{suite.name}</p>
+                      <p class="text-xs text-neutral-500 hidden sm:block">{suite.passed} of {suite.total} passed</p>
                     </div>
-                    <div class="w-32">
-                      <div class="h-2 bg-neutral-200 rounded-full overflow-hidden">
+                    <div class="w-16 sm:w-32">
+                      <div class="h-1.5 sm:h-2 bg-neutral-200 rounded-full overflow-hidden">
                         <div 
                           class="h-full bg-success-500 rounded-full" 
                           style={`width: ${suite.passRate}%`}
                         />
                       </div>
                     </div>
-                    <span class="text-sm font-medium text-neutral-900 w-12 text-right">
+                    <span class="text-xs sm:text-sm font-medium text-neutral-900 w-10 sm:w-12 text-right">
                       {suite.passRate}%
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div class="h-64 flex items-center justify-center text-neutral-500">
+              <div class="h-48 sm:h-64 flex items-center justify-center text-sm text-neutral-500">
                 No suite data available
               </div>
             )}
@@ -280,24 +284,24 @@ export async function reportsPage(c: Context<{ Bindings: Bindings }>) {
                 title: true,
                 priority: true,
                 status: true,
-                automated: true,
-                folder: true,
-                author: true,
-                created: true
+                automated: false,
+                folder: false,
+                author: false,
+                created: false
               },
               showColumnMenu: false
             }`}
           >
             {/* Filters and Column Toggle */}
-            <div class="flex flex-wrap items-center gap-4 mb-4 pb-4 border-b border-neutral-200">
-              <form method="GET" action="/reports" class="flex flex-wrap items-center gap-3 flex-1">
+            <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4 mb-4 pb-4 border-b border-neutral-200">
+              <form method="GET" action="/reports" class="flex flex-wrap items-center gap-2 sm:gap-3 flex-1">
                 {/* Priority Filter */}
                 <select 
                   name="priority" 
-                  class="px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  class="flex-1 sm:flex-none px-2 sm:px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   onchange="this.form.submit()"
                 >
-                  <option value="">All Priorities</option>
+                  <option value="">Priority</option>
                   <option value="Critical" selected={priorityFilter === 'Critical'}>Critical</option>
                   <option value="High" selected={priorityFilter === 'High'}>High</option>
                   <option value="Medium" selected={priorityFilter === 'Medium'}>Medium</option>
@@ -307,10 +311,10 @@ export async function reportsPage(c: Context<{ Bindings: Bindings }>) {
                 {/* Status Filter */}
                 <select 
                   name="status" 
-                  class="px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  class="flex-1 sm:flex-none px-2 sm:px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   onchange="this.form.submit()"
                 >
-                  <option value="">All Statuses</option>
+                  <option value="">Status</option>
                   <option value="Draft" selected={statusFilter === 'Draft'}>Draft</option>
                   <option value="Active" selected={statusFilter === 'Active'}>Active</option>
                   <option value="Deprecated" selected={statusFilter === 'Deprecated'}>Deprecated</option>
@@ -319,30 +323,30 @@ export async function reportsPage(c: Context<{ Bindings: Bindings }>) {
                 {/* Automated Filter */}
                 <select 
                   name="automated" 
-                  class="px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  class="flex-1 sm:flex-none px-2 sm:px-3 py-2 text-xs sm:text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   onchange="this.form.submit()"
                 >
-                  <option value="">All Types</option>
+                  <option value="">Type</option>
                   <option value="true" selected={automatedFilter === 'true'}>Automated</option>
                   <option value="false" selected={automatedFilter === 'false'}>Manual</option>
                 </select>
                 
                 {(priorityFilter || statusFilter || automatedFilter) && (
-                  <a href="/reports" class="text-sm text-primary-600 hover:text-primary-700">
-                    Clear Filters
+                  <a href="/reports" class="text-xs sm:text-sm text-primary-600 hover:text-primary-700 whitespace-nowrap">
+                    Clear
                   </a>
                 )}
               </form>
               
-              {/* Column Toggle Button */}
-              <div class="relative">
+              {/* Column Toggle Button - Hidden on small mobile */}
+              <div class="relative hidden sm:block">
                 <button
                   type="button"
                   x-on:click="showColumnMenu = !showColumnMenu"
                   class="flex items-center gap-2 px-3 py-2 text-sm border border-neutral-300 rounded-lg hover:bg-neutral-50"
                 >
                   <span dangerouslySetInnerHTML={{ __html: icons.columns }} />
-                  Columns
+                  <span class="hidden sm:inline">Columns</span>
                 </button>
                 
                 {/* Column Menu Dropdown */}
@@ -389,66 +393,98 @@ export async function reportsPage(c: Context<{ Bindings: Bindings }>) {
               </div>
             </div>
             
-            {/* Table */}
+            {/* Mobile: Card-based list, Desktop: Table */}
             {allTestCases.length > 0 ? (
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead>
-                    <tr class="border-b border-neutral-200">
-                      <th x-show="columns.id" class="text-left py-3 px-2 font-medium text-neutral-700">ID</th>
-                      <th x-show="columns.title" class="text-left py-3 px-2 font-medium text-neutral-700">Title</th>
-                      <th x-show="columns.priority" class="text-left py-3 px-2 font-medium text-neutral-700">Priority</th>
-                      <th x-show="columns.status" class="text-left py-3 px-2 font-medium text-neutral-700">Status</th>
-                      <th x-show="columns.automated" class="text-left py-3 px-2 font-medium text-neutral-700">Type</th>
-                      <th x-show="columns.folder" class="text-left py-3 px-2 font-medium text-neutral-700">Folder</th>
-                      <th x-show="columns.author" class="text-left py-3 px-2 font-medium text-neutral-700">Author</th>
-                      <th x-show="columns.created" class="text-left py-3 px-2 font-medium text-neutral-700">Created</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {allTestCases.map(({ testCase, folder, author }) => (
-                      <tr key={testCase.id} class="border-b border-neutral-100 hover:bg-neutral-50">
-                        <td x-show="columns.id" class="py-3 px-2">
-                          <a href={`/test-case/${testCase.id}`} class="font-mono text-primary-600 hover:text-primary-700">
-                            {generateTestCaseId(testCase.id)}
-                          </a>
-                        </td>
-                        <td x-show="columns.title" class="py-3 px-2">
-                          <a href={`/test-case/${testCase.id}`} class="text-neutral-900 hover:text-primary-600">
-                            {testCase.title}
-                          </a>
-                        </td>
-                        <td x-show="columns.priority" class="py-3 px-2">
-                          <Badge variant={testCase.priority === 'Critical' ? 'danger' : testCase.priority === 'High' ? 'danger' : testCase.priority === 'Medium' ? 'warning' : 'neutral'}>
-                            {testCase.priority || 'Medium'}
-                          </Badge>
-                        </td>
-                        <td x-show="columns.status" class="py-3 px-2">
-                          <Badge variant={testCase.status === 'Active' ? 'success' : testCase.status === 'Deprecated' ? 'neutral' : 'info'}>
-                            {testCase.status || 'Draft'}
-                          </Badge>
-                        </td>
-                        <td x-show="columns.automated" class="py-3 px-2">
-                          <span class={`text-xs px-2 py-0.5 rounded ${testCase.isAutomated ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'}`}>
-                            {testCase.isAutomated ? 'Automated' : 'Manual'}
-                          </span>
-                        </td>
-                        <td x-show="columns.folder" class="py-3 px-2 text-neutral-600">
-                          {folder?.name || '-'}
-                        </td>
-                        <td x-show="columns.author" class="py-3 px-2 text-neutral-600">
-                          {author?.fullName || author?.email || '-'}
-                        </td>
-                        <td x-show="columns.created" class="py-3 px-2 text-neutral-500 text-xs">
-                          {formatDate(testCase.createdAt)}
-                        </td>
+              <>
+                {/* Mobile Card View */}
+                <div class="sm:hidden space-y-3">
+                  {allTestCases.map(({ testCase, folder, author }) => (
+                    <a 
+                      key={testCase.id}
+                      href={`/test-case/${testCase.id}`}
+                      class="block p-3 bg-neutral-50 hover:bg-neutral-100 rounded-lg border border-neutral-200 transition-colors"
+                    >
+                      <div class="flex items-start justify-between gap-2 mb-2">
+                        <div class="min-w-0">
+                          <span class="text-xs font-mono text-primary-600">{generateTestCaseId(testCase.id)}</span>
+                          <h4 class="text-sm font-medium text-neutral-900 truncate mt-0.5">{testCase.title}</h4>
+                        </div>
+                        <Badge variant={testCase.priority === 'Critical' ? 'danger' : testCase.priority === 'High' ? 'danger' : testCase.priority === 'Medium' ? 'warning' : 'neutral'}>
+                          {testCase.priority || 'Medium'}
+                        </Badge>
+                      </div>
+                      <div class="flex items-center gap-2 text-xs text-neutral-500">
+                        <Badge variant={testCase.status === 'Active' ? 'success' : testCase.status === 'Deprecated' ? 'neutral' : 'info'}>
+                          {testCase.status || 'Draft'}
+                        </Badge>
+                        <span class={`px-1.5 py-0.5 rounded ${testCase.isAutomated ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'}`}>
+                          {testCase.isAutomated ? 'Auto' : 'Manual'}
+                        </span>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+
+                {/* Desktop Table View */}
+                <div class="hidden sm:block overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead>
+                      <tr class="border-b border-neutral-200">
+                        <th x-show="columns.id" class="text-left py-3 px-2 font-medium text-neutral-700">ID</th>
+                        <th x-show="columns.title" class="text-left py-3 px-2 font-medium text-neutral-700">Title</th>
+                        <th x-show="columns.priority" class="text-left py-3 px-2 font-medium text-neutral-700">Priority</th>
+                        <th x-show="columns.status" class="text-left py-3 px-2 font-medium text-neutral-700">Status</th>
+                        <th x-show="columns.automated" class="text-left py-3 px-2 font-medium text-neutral-700">Type</th>
+                        <th x-show="columns.folder" class="text-left py-3 px-2 font-medium text-neutral-700">Folder</th>
+                        <th x-show="columns.author" class="text-left py-3 px-2 font-medium text-neutral-700">Author</th>
+                        <th x-show="columns.created" class="text-left py-3 px-2 font-medium text-neutral-700">Created</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {allTestCases.map(({ testCase, folder, author }) => (
+                        <tr key={testCase.id} class="border-b border-neutral-100 hover:bg-neutral-50">
+                          <td x-show="columns.id" class="py-3 px-2">
+                            <a href={`/test-case/${testCase.id}`} class="font-mono text-primary-600 hover:text-primary-700">
+                              {generateTestCaseId(testCase.id)}
+                            </a>
+                          </td>
+                          <td x-show="columns.title" class="py-3 px-2">
+                            <a href={`/test-case/${testCase.id}`} class="text-neutral-900 hover:text-primary-600">
+                              {testCase.title}
+                            </a>
+                          </td>
+                          <td x-show="columns.priority" class="py-3 px-2">
+                            <Badge variant={testCase.priority === 'Critical' ? 'danger' : testCase.priority === 'High' ? 'danger' : testCase.priority === 'Medium' ? 'warning' : 'neutral'}>
+                              {testCase.priority || 'Medium'}
+                            </Badge>
+                          </td>
+                          <td x-show="columns.status" class="py-3 px-2">
+                            <Badge variant={testCase.status === 'Active' ? 'success' : testCase.status === 'Deprecated' ? 'neutral' : 'info'}>
+                              {testCase.status || 'Draft'}
+                            </Badge>
+                          </td>
+                          <td x-show="columns.automated" class="py-3 px-2">
+                            <span class={`text-xs px-2 py-0.5 rounded ${testCase.isAutomated ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'}`}>
+                              {testCase.isAutomated ? 'Automated' : 'Manual'}
+                            </span>
+                          </td>
+                          <td x-show="columns.folder" class="py-3 px-2 text-neutral-600">
+                            {folder?.name || '-'}
+                          </td>
+                          <td x-show="columns.author" class="py-3 px-2 text-neutral-600">
+                            {author?.fullName || author?.email || '-'}
+                          </td>
+                          <td x-show="columns.created" class="py-3 px-2 text-neutral-500 text-xs">
+                            {formatDate(testCase.createdAt)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             ) : (
-              <div class="py-12 text-center text-neutral-500">
+              <div class="py-8 sm:py-12 text-center text-sm text-neutral-500">
                 No test cases match the current filters
               </div>
             )}
