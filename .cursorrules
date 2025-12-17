@@ -1,0 +1,49 @@
+# TestCase Pro Development Rules
+
+## Project Context
+This is a production-ready Test Case Management System built with Next.js, TypeScript, Drizzle ORM, and SQLite.
+
+## Architecture Patterns
+- Use server-side rendering where appropriate
+- API routes handle all database operations
+- Client components for interactive UI
+- Maintain separation between public and authenticated routes
+
+## Code Style
+- Use TypeScript for all files
+- Follow Next.js 14 App Router conventions (but we use Pages Router)
+- Use functional components with hooks
+- Prefer named exports for components
+- Use Tailwind CSS for styling
+
+## Security Requirements
+- Always validate input on the server-side
+- Use NextAuth for authentication
+- Never expose sensitive data in API responses
+- Use parameterized queries (Drizzle ORM handles this)
+- Implement proper error handling
+
+## Database Operations
+- Use Drizzle ORM for all database queries
+- Always use transactions for multi-step operations
+- Respect foreign key constraints
+- Use indexes for frequently queried columns
+
+## UI/UX Guidelines
+- Maintain the professional blue/purple color scheme
+- Ensure responsive design for all components
+- Show loading states during async operations
+- Provide clear error messages to users
+- Use toast notifications for user feedback
+
+## Testing User Flows
+- Always start test cases with "Login with [Role]" as per user rules
+- Follow the established folder structure for organization
+- Maintain data integrity across test runs
+
+## Component Organization
+- Keep components small and focused
+- Extract reusable logic into custom hooks
+- Use composition over inheritance
+- Maintain consistent prop naming
+

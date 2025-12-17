@@ -1,0 +1,34 @@
+{
+  "name": "testcase-pro",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply testcase-pro-db --local",
+    "db:migrate:prod": "wrangler d1 migrations apply testcase-pro-db",
+    "db:seed": "wrangler d1 execute testcase-pro-db --local --file=./scripts/seed.sql",
+    "css:build": "tailwindcss -i ./src/styles/input.css -o ./src/static/styles.css --minify && node scripts/generate-css-module.js",
+    "css:watch": "tailwindcss -i ./src/styles/input.css -o ./src/static/styles.css --watch",
+    "build": "npm run css:build"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.4.0",
+    "@noble/hashes": "^1.4.0",
+    "date-fns": "^3.0.0",
+    "drizzle-orm": "^0.30.0",
+    "hono": "^4.6.0",
+    "papaparse": "^5.4.1",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241205.0",
+    "@types/papaparse": "^5.3.14",
+    "drizzle-kit": "^0.20.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.0",
+    "wrangler": "^4.54.0"
+  }
+}

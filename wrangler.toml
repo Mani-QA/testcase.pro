@@ -1,0 +1,20 @@
+name = "testcase-pro"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+JWT_SECRET = "your-super-secret-jwt-key-change-in-production"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "testcase-pro-db"
+database_id = "e22c9125-bf86-4bc4-82f1-95ece709f110"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "df0b3557679d49089957840c8ac09768"
+
+[site]
+bucket = "./src/static"
+
