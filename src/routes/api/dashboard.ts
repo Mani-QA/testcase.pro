@@ -5,6 +5,7 @@ import { testCases, testSuites, testRunEntries } from '../../db/schema';
 import { sql, gte } from 'drizzle-orm';
 import { authMiddleware } from '../../middleware/auth';
 import { format, subDays } from 'date-fns';
+import { setCacheHeaders, CacheTTL } from '../../middleware/cache';
 
 const dashboardRoutes = new Hono<{ Bindings: Bindings }>();
 
@@ -12,6 +13,7 @@ const dashboardRoutes = new Hono<{ Bindings: Bindings }>();
 dashboardRoutes.use('*', authMiddleware);
 
 // GET /api/dashboard/stats - Get dashboard statistics
+// Cache for 5 minutes - dashboard data doesn't need real-time updates
 dashboardRoutes.get('/stats', async (c) => {
   const db = createDb(c.env.DB);
   
@@ -50,6 +52,11 @@ dashboardRoutes.get('/stats', async (c) => {
       .where(gte(testRunEntries.executedAt, thirtyDaysAgo))
       .groupBy(sql`date(${testRunEntries.executedAt})`)
       .orderBy(sql`date(${testRunEntries.executedAt})`);
+    
+    // Set cache headers for edge caching (5 min cache, 2.5 min stale-while-revalidate)
+    setCacheHeaders(c, CacheTTL.DASHBOARD_STATS, { 
+      staleWhileRevalidate: Math.floor(CacheTTL.DASHBOARD_STATS / 2) 
+    });
     
     return c.json({
       statusDistribution: statusDistribution.map(s => ({

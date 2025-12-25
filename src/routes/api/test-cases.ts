@@ -8,6 +8,7 @@ import { eq, and, inArray, isNull, sql } from 'drizzle-orm';
 import { authMiddleware, requireAuthForMutations, requireAuth } from '../../middleware/auth';
 import Papa from 'papaparse';
 import { generateTestCaseId } from '../../lib/utils';
+import { setCacheHeaders, CacheTTL } from '../../middleware/cache';
 
 const testCasesRoutes = new Hono<{ Bindings: Bindings }>();
 
@@ -78,6 +79,11 @@ testCasesRoutes.get('/', async (c) => {
         };
       })
     );
+    
+    // Set cache headers for edge caching (2 min cache, stale-while-revalidate)
+    setCacheHeaders(c, CacheTTL.LIST_API, { 
+      staleWhileRevalidate: CacheTTL.LIST_API 
+    });
     
     return c.json(testCasesWithDetails);
   } catch (error) {
@@ -216,6 +222,11 @@ testCasesRoutes.get('/:id', async (c) => {
       .from(testCaseTags)
       .leftJoin(tags, eq(testCaseTags.tagId, tags.id))
       .where(eq(testCaseTags.testCaseId, id));
+    
+    // Set cache headers for edge caching (1 min cache)
+    setCacheHeaders(c, CacheTTL.ITEM_API, { 
+      staleWhileRevalidate: CacheTTL.ITEM_API 
+    });
     
     return c.json({
       ...result.testCase,

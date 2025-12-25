@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { Bindings } from '../../types';
 import { authMiddleware } from '../../middleware/auth';
+import { setCacheHeaders, CacheTTL } from '../../middleware/cache';
 
 // Import page handlers
 import { dashboardPage } from './dashboard';

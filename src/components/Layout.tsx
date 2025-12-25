@@ -35,11 +35,32 @@ export const Layout: FC<LayoutProps> = ({ children, user, currentPath, title }) 
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{title ? `${title} | TestCase Pro` : 'TestCase Pro'}</title>
+        
+        {/* SEO Meta Tags */}
+        <meta name="description" content="TestCase Pro - Professional Test Case Management System for QA teams" />
+        <meta name="robots" content="index, follow" />
+        
+        {/* DNS Prefetch & Preconnect for faster external resource loading */}
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="anonymous" />
+        
+        {/* Preload critical resources */}
+        <link rel="preload" href="/static/styles.css" as="style" />
+        
+        {/* Stylesheets */}
         <link rel="stylesheet" href="/static/styles.css" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-        <script src="https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        
+        {/* Scripts with proper loading strategy */}
+        {/* HTMX - Load immediately as it's needed for interactivity */}
+        <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.10/dist/htmx.min.js"></script>
+        {/* Alpine.js - Defer loading as it's for UI enhancements */}
+        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
+        {/* Chart.js - Only needed on dashboard/reports pages */}
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
       </head>
       <body class="bg-neutral-50" x-data="{ sidebarOpen: false }">
         <div class="flex h-screen">
@@ -79,8 +100,8 @@ export const Layout: FC<LayoutProps> = ({ children, user, currentPath, title }) 
 
           {/* Sidebar */}
           <aside 
-            class="fixed lg:static inset-y-0 left-0 z-50 w-72 lg:w-64 bg-white border-r border-neutral-200 flex flex-col shadow-strong lg:shadow-soft transform transition-transform duration-300 ease-out lg:transform-none"
-            x-bind:class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+            class="fixed lg:static inset-y-0 left-0 z-50 w-72 lg:w-64 bg-white border-r border-neutral-200 flex flex-col shadow-strong lg:shadow-soft transform transition-transform duration-300 ease-out lg:translate-x-0"
+            x-bind:class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
           >
             {/* Logo */}
             <div class="p-6 border-b border-neutral-200 flex items-center justify-between">
@@ -140,7 +161,7 @@ export const Layout: FC<LayoutProps> = ({ children, user, currentPath, title }) 
                       <p class="text-xs text-neutral-500">QA Member</p>
                     </div>
                   </div>
-                  <form action="/api/auth/signout" method="POST">
+                  <form action="/api/auth/signout" method="post">
                     <button
                       type="submit"
                       class="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-600 hover:text-danger-600 hover:bg-danger-50 rounded-lg transition-colors"

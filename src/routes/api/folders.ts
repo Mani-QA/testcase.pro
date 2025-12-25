@@ -6,6 +6,7 @@ import { createDb } from '../../db';
 import { folders } from '../../db/schema';
 import { eq } from 'drizzle-orm';
 import { authMiddleware, requireAuthForMutations } from '../../middleware/auth';
+import { setCacheHeaders, CacheTTL } from '../../middleware/cache';
 
 const foldersRoutes = new Hono<{ Bindings: Bindings }>();
 
@@ -27,11 +28,18 @@ const updateFolderSchema = z.object({
 });
 
 // GET /api/folders - Get all folders
+// Cache for 2 minutes - folder structure changes infrequently
 foldersRoutes.get('/', async (c) => {
   const db = createDb(c.env.DB);
   
   try {
     const allFolders = await db.select().from(folders);
+    
+    // Set cache headers for edge caching
+    setCacheHeaders(c, CacheTTL.LIST_API, { 
+      staleWhileRevalidate: CacheTTL.LIST_API 
+    });
+    
     return c.json(allFolders);
   } catch (error) {
     console.error('Get folders error:', error);
@@ -40,6 +48,7 @@ foldersRoutes.get('/', async (c) => {
 });
 
 // GET /api/folders/:id - Get folder by ID
+// Cache for 1 minute - individual item cache
 foldersRoutes.get('/:id', async (c) => {
   const id = parseInt(c.req.param('id'));
   const db = createDb(c.env.DB);
@@ -54,6 +63,11 @@ foldersRoutes.get('/:id', async (c) => {
     if (!folder) {
       return c.json({ error: 'Folder not found' }, 404);
     }
+    
+    // Set cache headers for edge caching
+    setCacheHeaders(c, CacheTTL.ITEM_API, { 
+      staleWhileRevalidate: CacheTTL.ITEM_API 
+    });
     
     return c.json(folder);
   } catch (error) {

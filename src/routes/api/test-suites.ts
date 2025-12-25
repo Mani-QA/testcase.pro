@@ -6,6 +6,7 @@ import { createDb } from '../../db';
 import { testSuites, testRunEntries, testCases, testCaseSteps, testRunStepResults, users } from '../../db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { authMiddleware, requireAuth } from '../../middleware/auth';
+import { setCacheHeaders, CacheTTL } from '../../middleware/cache';
 
 const testSuitesRoutes = new Hono<{ Bindings: Bindings }>();
 
@@ -64,6 +65,11 @@ testSuitesRoutes.get('/', async (c) => {
         };
       })
     );
+    
+    // Set cache headers for edge caching (2 min cache)
+    setCacheHeaders(c, CacheTTL.LIST_API, { 
+      staleWhileRevalidate: CacheTTL.LIST_API 
+    });
     
     return c.json(suitesWithStats);
   } catch (error) {

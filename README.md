@@ -20,6 +20,7 @@ A production-ready Test Case Management System built with Hono, Cloudflare Worke
 - **Cost Effective**: Pay only for compute time with generous free tier (100,000 requests/day free)
 - **Built-in Security**: Automatic DDoS protection, SSL/TLS, and isolated V8 execution environment
 - **Simplified DevOps**: No server management, auto-scaling, or infrastructure maintenance required
+- **Edge Caching**: Built-in Cache API for caching responses at the edge, reducing Worker invocations
 
 ### Framework: Hono
 **Why we chose it:**
@@ -188,6 +189,43 @@ edge/
 ├── tsconfig.json
 └── package.json
 ```
+
+## Edge Caching Strategy
+
+This application implements aggressive edge caching to minimize Cloudflare Workers requests and reduce costs.
+
+### Cache Tiers
+
+| Resource Type | TTL | Strategy |
+|--------------|-----|----------|
+| Static Assets (CSS) | 1 year | Immutable, fingerprinted |
+| CDN Libraries (JS) | 1 year | Immutable, versioned |
+| Dashboard Stats API | 5 min | Stale-while-revalidate |
+| List APIs (folders, test cases) | 2 min | Stale-while-revalidate |
+| Individual Item APIs | 1 min | Stale-while-revalidate |
+
+### How It Works
+
+1. **Static Assets**: CSS and other static files are served with `Cache-Control: public, max-age=31536000, immutable` headers. The browser and edge cache them indefinitely.
+
+2. **API Responses**: GET requests to API endpoints include `Cache-Control` headers with appropriate TTLs. The Cloudflare edge caches these responses and serves them without invoking the Worker.
+
+3. **Stale-While-Revalidate**: API responses use `stale-while-revalidate` to serve cached content immediately while refreshing in the background.
+
+4. **ETag Support**: ETags are generated for responses, enabling conditional requests (304 Not Modified) that save bandwidth.
+
+5. **Cache Invalidation**: POST/PUT/DELETE requests bypass the cache, and related cache entries are purged on mutations.
+
+### Expected Benefits
+
+- **70-90% reduction in Worker requests** for typical usage patterns
+- **Faster response times** (0ms from edge cache vs 50-200ms from Worker)
+- **Lower costs** (fewer Worker invocations = lower billing)
+- **Better reliability** (cached responses available even during Worker issues)
+
+### Local Development
+
+Note: The Cloudflare Cache API works differently in local development (wrangler dev). To fully test caching behavior, deploy to Cloudflare Workers staging environment.
 
 ## API Endpoints
 

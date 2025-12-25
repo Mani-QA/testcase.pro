@@ -6,6 +6,7 @@ import { createDb } from '../../db';
 import { testRunEntries, testCases, testCaseSteps, testRunStepResults } from '../../db/schema';
 import { eq } from 'drizzle-orm';
 import { authMiddleware, requireAuth } from '../../middleware/auth';
+import { setCacheHeaders, CacheTTL } from '../../middleware/cache';
 
 const testRunsRoutes = new Hono<{ Bindings: Bindings }>();
 
@@ -58,6 +59,11 @@ testRunsRoutes.get('/:id', async (c) => {
       .from(testRunStepResults)
       .where(eq(testRunStepResults.testRunEntryId, id))
       .orderBy(testRunStepResults.stepNumber);
+    
+    // Set cache headers for edge caching (1 min cache for run details)
+    setCacheHeaders(c, CacheTTL.ITEM_API, { 
+      staleWhileRevalidate: CacheTTL.ITEM_API 
+    });
     
     return c.json({
       ...entry.entry,
