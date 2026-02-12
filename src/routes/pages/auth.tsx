@@ -100,6 +100,22 @@ export async function signInPage(c: Context<{ Bindings: Bindings }>) {
               </a>
             </div>
           </div>
+
+          {/* Footer */}
+          <footer class="mt-8 text-center text-sm text-neutral-500" role="contentinfo" data-testid="app-footer">
+            Developed by{' '}
+            <a
+              href="https://ManiG.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-primary-600 hover:text-primary-700 font-medium transition-colors"
+              aria-label="Visit ManiG's website"
+            >
+              ManiG
+            </a>
+            {' '}with{' '}
+            <span class="text-red-500" aria-label="love">&#10084;</span>
+          </footer>
         </div>
       </body>
     </html>
@@ -208,6 +224,22 @@ export async function signUpPage(c: Context<{ Bindings: Bindings }>) {
               </p>
             </div>
           </div>
+
+          {/* Footer */}
+          <footer class="mt-8 text-center text-sm text-neutral-500" role="contentinfo" data-testid="app-footer">
+            Developed by{' '}
+            <a
+              href="https://ManiG.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-primary-600 hover:text-primary-700 font-medium transition-colors"
+              aria-label="Visit ManiG's website"
+            >
+              ManiG
+            </a>
+            {' '}with{' '}
+            <span class="text-red-500" aria-label="love">&#10084;</span>
+          </footer>
         </div>
       </body>
     </html>

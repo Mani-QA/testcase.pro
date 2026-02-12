@@ -191,8 +191,25 @@ export const Layout: FC<LayoutProps> = ({ children, user, currentPath, title }) 
 
           {/* Main Content */}
           <main class="flex-1 overflow-auto bg-neutral-50 pt-14 pb-20 lg:pt-0 lg:pb-0">
-            <div class="min-h-full">
-              {children}
+            <div class="min-h-full flex flex-col">
+              <div class="flex-1">
+                {children}
+              </div>
+              {/* Footer */}
+              <footer class="py-4 text-center text-sm text-neutral-500" role="contentinfo" data-testid="app-footer">
+                Developed by{' '}
+                <a
+                  href="https://ManiG.dev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-primary-600 hover:text-primary-700 font-medium transition-colors"
+                  aria-label="Visit ManiG's website"
+                >
+                  ManiG
+                </a>
+                {' '}with{' '}
+                <span class="text-red-500" aria-label="love">&#10084;</span>
+              </footer>
             </div>
           </main>
         </div>
