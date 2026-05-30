@@ -9,6 +9,7 @@ import { testPlanPage, testCaseViewPage, testCaseEditPage, testCaseNewPage, impo
 import { testRunListPage, testRunExecutePage, testRunCreatePage } from './test-run';
 import { reportsPage } from './reports';
 import { signInPage, signUpPage } from './auth';
+import { requirementsPage } from './requirements';
 
 const pageRoutes = new Hono<{ Bindings: Bindings }>();
 
@@ -20,6 +21,9 @@ pageRoutes.get('/', (c) => c.redirect('/dashboard'));
 
 // Dashboard
 pageRoutes.get('/dashboard', dashboardPage);
+
+// Requirements
+pageRoutes.get('/requirements', requirementsPage);
 
 // Test Plan pages
 pageRoutes.get('/test-plan', testPlanPage);

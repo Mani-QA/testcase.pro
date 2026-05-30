@@ -4,7 +4,7 @@ import { Layout } from '../../components/Layout';
 import { Card } from '../../components/Card';
 import { Button } from '../../components/Button';
 import { createDb } from '../../db';
-import { testCases, testSuites, testRunEntries } from '../../db/schema';
+import { testCases, testSuites, testRunEntries, requirements } from '../../db/schema';
 import { sql, gte } from 'drizzle-orm';
 import { format, subDays } from 'date-fns';
 
@@ -14,6 +14,7 @@ const icons = {
   check: `<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
   trend: `<svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>`,
   login: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>`,
+  requirements: `<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>`,
 };
 
 export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
@@ -32,6 +33,10 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
   const [testRunCount] = await db
     .select({ count: sql<number>`count(*)` })
     .from(testRunEntries);
+
+  const [requirementCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(requirements);
   
   // Get status distribution
   const statusDistribution = await db
@@ -58,6 +63,7 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
     totalTestCases: Number(testCaseCount?.count || 0),
     totalTestSuites: Number(testSuiteCount?.count || 0),
     totalTestRuns: Number(testRunCount?.count || 0),
+    totalRequirements: Number(requirementCount?.count || 0),
   };
   
   const statusData = statusDistribution.map(s => ({
@@ -72,6 +78,7 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
   
   const summaryCards = [
     { title: 'Total Test Cases', value: stats.totalTestCases, icon: icons.folder, color: 'from-primary-500 to-primary-600' },
+    { title: 'Requirements', value: stats.totalRequirements, icon: icons.requirements, color: 'from-warning-500 to-warning-600' },
     { title: 'Test Suites', value: stats.totalTestSuites, icon: icons.play, color: 'from-secondary-500 to-secondary-600' },
     { title: 'Test Runs', value: stats.totalTestRuns, icon: icons.check, color: 'from-success-500 to-success-600' },
   ];
@@ -115,10 +122,10 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
           </Card>
         )}
 
-        {/* Summary Cards - 2 columns on mobile, 3 on desktop */}
-        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
+        {/* Summary Cards - 2 columns on mobile, 4 on desktop */}
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
           {summaryCards.map((card, index) => (
-            <Card key={card.title} padding={false} className={index === 2 ? 'col-span-2 lg:col-span-1' : ''}>
+            <Card key={card.title} padding={false}>
               <div class="p-4 sm:p-6">
                 <div class="flex items-center justify-between gap-2">
                   <div class="min-w-0">

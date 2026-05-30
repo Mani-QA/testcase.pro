@@ -12,6 +12,7 @@ import { tagsRoutes } from './routes/api/tags';
 import { testSuitesRoutes } from './routes/api/test-suites';
 import { testRunsRoutes } from './routes/api/test-runs';
 import { dashboardRoutes } from './routes/api/dashboard';
+import { requirementsRoutes } from './routes/api/requirements';
 
 // Import page routes
 import { pageRoutes } from './routes/pages';
@@ -89,6 +90,7 @@ app.route('/api/tags', tagsRoutes);
 app.route('/api/test-suites', testSuitesRoutes);
 app.route('/api/test-runs', testRunsRoutes);
 app.route('/api/dashboard', dashboardRoutes);
+app.route('/api/requirements', requirementsRoutes);
 
 // Page Routes (SSR)
 app.route('/', pageRoutes);

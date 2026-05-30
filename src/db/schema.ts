@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { relations, sql } from 'drizzle-orm';
 
 // 1. USERS (For Authentication)
@@ -130,6 +130,7 @@ export const testCasesRelations = relations(testCases, ({ one, many }) => ({
   steps: many(testCaseSteps),
   tags: many(testCaseTags),
   testRunEntries: many(testRunEntries),
+  requirements: many(testCaseRequirements),
 }));
 
 export const testCaseStepsRelations = relations(testCaseSteps, ({ one }) => ({
@@ -184,4 +185,38 @@ export const testRunStepResultsRelations = relations(testRunStepResults, ({ one 
     references: [testRunEntries.id],
   }),
 }));
+
+// 9. REQUIREMENTS (User Stories / Requirements)
+export const requirements = sqliteTable('requirements', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  reqId: text('req_id').notNull().unique(),
+  title: text('title').notNull(),
+  description: text('description'),
+  status: text('status').default('Open'),
+  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Junction table to handle many-to-many relationship between Test Cases and Requirements
+export const testCaseRequirements = sqliteTable('test_case_requirements', {
+  testCaseId: integer('test_case_id').notNull().references(() => testCases.id, { onDelete: 'cascade' }),
+  requirementId: integer('requirement_id').notNull().references(() => requirements.id, { onDelete: 'cascade' }),
+}, (table) => ({
+  uniqueIdx: uniqueIndex('tc_req_unique_idx').on(table.testCaseId, table.requirementId),
+}));
+
+export const requirementsRelations = relations(requirements, ({ many }) => ({
+  testCases: many(testCaseRequirements),
+}));
+
+export const testCaseRequirementsRelations = relations(testCaseRequirements, ({ one }) => ({
+  testCase: one(testCases, {
+    fields: [testCaseRequirements.testCaseId],
+    references: [testCases.id],
+  }),
+  requirement: one(requirements, {
+    fields: [testCaseRequirements.requirementId],
+    references: [requirements.id],
+  }),
+}));
+
 

@@ -4,6 +4,7 @@ export type Bindings = {
   DB: D1Database;
   SESSIONS: KVNamespace;
   JWT_SECRET: string;
+  AI?: any;
 };
 
 export interface User {
@@ -89,6 +90,22 @@ export interface DashboardStats {
     totalTestCases: number;
     totalTestSuites: number;
     totalTestRuns: number;
+    totalRequirements?: number;
   };
+}
+
+export interface Requirement {
+  id: number;
+  reqId: string;
+  title: string;
+  description: string | null;
+  status: string | null;
+  createdAt: string | null;
+  testCaseCount?: number;
+}
+
+export interface TestCaseRequirement {
+  testCaseId: number;
+  requirementId: number;
 }
 

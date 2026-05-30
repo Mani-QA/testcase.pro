@@ -9,6 +9,8 @@ compatibility_flags = ["nodejs_compat"]
 binding = "DB"
 database_name = "testcase-pro-db"
 database_id = "e22c9125-bf86-4bc4-82f1-95ece709f110"
+migrations_dir = "drizzle"
+
 
 [[kv_namespaces]]
 binding = "SESSIONS"
@@ -16,4 +18,8 @@ id = "df0b3557679d49089957840c8ac09768"
 
 [site]
 bucket = "./src/static"
+
+[ai]
+binding = "AI"
+
 
