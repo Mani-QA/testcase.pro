@@ -19,6 +19,7 @@ const icons = {
 export async function testRunListPage(c: Context<{ Bindings: Bindings }>) {
   const user = c.get('user');
   const db = createDb(c.env.DB);
+  const statusFilter = c.req.query('status') || '';
   
   // Get all test suites with stats
   const suites = await db
@@ -30,7 +31,7 @@ export async function testRunListPage(c: Context<{ Bindings: Bindings }>) {
     .leftJoin(users, eq(testSuites.createdBy, users.id))
     .orderBy(sql`${testSuites.createdAt} DESC`);
   
-  const suitesWithStats = await Promise.all(
+  let suitesWithStats = await Promise.all(
     suites.map(async ({ suite, creator }) => {
       const stats = await db
         .select({
@@ -54,6 +55,16 @@ export async function testRunListPage(c: Context<{ Bindings: Bindings }>) {
       };
     })
   );
+
+  if (statusFilter) {
+    suitesWithStats = suitesWithStats.filter(s => {
+      if (statusFilter === 'Passed') return s.stats.passed > 0;
+      if (statusFilter === 'Failed') return s.stats.failed > 0;
+      if (statusFilter === 'Blocked') return s.stats.blocked > 0;
+      if (statusFilter === 'Not Run') return s.stats.notRun > 0;
+      return true;
+    });
+  }
   
   const canEdit = !!user;
   
@@ -83,6 +94,19 @@ export async function testRunListPage(c: Context<{ Bindings: Bindings }>) {
               </a>
             )}
           </div>
+
+          {statusFilter && (
+            <div class="mb-4 flex items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary-50 text-primary-700 border border-primary-200">
+                <span>Filter: {statusFilter}</span>
+                <a href="/test-run" class="text-primary-400 hover:text-primary-600 focus:outline-none transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </a>
+              </span>
+            </div>
+          )}
           
           {/* Test Suites List */}
           <div id="test-suites-list">

@@ -9,7 +9,7 @@ import { testPlanPage, testCaseViewPage, testCaseEditPage, testCaseNewPage, impo
 import { testRunListPage, testRunExecutePage, testRunCreatePage } from './test-run';
 import { reportsPage } from './reports';
 import { signInPage, signUpPage } from './auth';
-import { requirementsPage } from './requirements';
+import { requirementsPage, requirementsNewPage, requirementsDetailPage } from './requirements';
 
 const pageRoutes = new Hono<{ Bindings: Bindings }>();
 
@@ -24,6 +24,8 @@ pageRoutes.get('/dashboard', dashboardPage);
 
 // Requirements
 pageRoutes.get('/requirements', requirementsPage);
+pageRoutes.get('/requirements/new', requirementsNewPage);
+pageRoutes.get('/requirements/:id', requirementsDetailPage);
 
 // Test Plan pages
 pageRoutes.get('/test-plan', testPlanPage);

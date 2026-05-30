@@ -77,10 +77,10 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
   }));
   
   const summaryCards = [
-    { title: 'Total Test Cases', value: stats.totalTestCases, icon: icons.folder, color: 'from-primary-500 to-primary-600' },
-    { title: 'Requirements', value: stats.totalRequirements, icon: icons.requirements, color: 'from-warning-500 to-warning-600' },
-    { title: 'Test Suites', value: stats.totalTestSuites, icon: icons.play, color: 'from-secondary-500 to-secondary-600' },
-    { title: 'Test Runs', value: stats.totalTestRuns, icon: icons.check, color: 'from-success-500 to-success-600' },
+    { title: 'Total Test Cases', value: stats.totalTestCases, icon: icons.folder, color: 'from-primary-500 to-primary-600', link: '/test-plan' },
+    { title: 'Requirements', value: stats.totalRequirements, icon: icons.requirements, color: 'from-warning-500 to-warning-600', link: '/requirements' },
+    { title: 'Test Suites', value: stats.totalTestSuites, icon: icons.play, color: 'from-secondary-500 to-secondary-600', link: '/test-plan' },
+    { title: 'Test Runs', value: stats.totalTestRuns, icon: icons.check, color: 'from-success-500 to-success-600', link: '/test-run' },
   ];
   
   return c.html(
@@ -125,19 +125,25 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
         {/* Summary Cards - 2 columns on mobile, 4 on desktop */}
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
           {summaryCards.map((card, index) => (
-            <Card key={card.title} padding={false}>
-              <div class="p-4 sm:p-6">
-                <div class="flex items-center justify-between gap-2">
-                  <div class="min-w-0">
-                    <p class="text-xs sm:text-sm text-neutral-600 mb-0.5 sm:mb-1 truncate">{card.title}</p>
-                    <p class="text-2xl sm:text-3xl font-bold text-neutral-900">{card.value}</p>
-                  </div>
-                  <div class={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br ${card.color} rounded-lg sm:rounded-xl flex items-center justify-center shadow-medium`}>
-                    <span class="scale-75 sm:scale-100" dangerouslySetInnerHTML={{ __html: card.icon }} />
+            <a 
+              href={card.link} 
+              key={card.title} 
+              class="block transform hover:-translate-y-1 hover:shadow-medium active:translate-y-0 transition-all duration-300 rounded-xl"
+            >
+              <Card padding={false} className="h-full hover:border-primary-300 transition-colors">
+                <div class="p-4 sm:p-6">
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <p class="text-xs sm:text-sm text-neutral-600 mb-0.5 sm:mb-1 truncate">{card.title}</p>
+                      <p class="text-2xl sm:text-3xl font-bold text-neutral-900">{card.value}</p>
+                    </div>
+                    <div class={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br ${card.color} rounded-lg sm:rounded-xl flex items-center justify-center shadow-medium`}>
+                      <span class="scale-75 sm:scale-100" dangerouslySetInnerHTML={{ __html: card.icon }} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </a>
           ))}
         </div>
 
@@ -208,7 +214,7 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
           if (statusData.length > 0) {
             const statusCtx = document.getElementById('statusChart');
             if (statusCtx) {
-              new Chart(statusCtx, {
+              const statusChart = new Chart(statusCtx, {
                 type: 'doughnut',
                 data: {
                   labels: statusData.map(d => d.status),
@@ -221,6 +227,16 @@ export async function dashboardPage(c: Context<{ Bindings: Bindings }>) {
                 options: {
                   responsive: true,
                   maintainAspectRatio: false,
+                  onClick: (event, elements) => {
+                    if (elements && elements.length > 0) {
+                      const elementIndex = elements[0].index;
+                      const label = statusChart.data.labels[elementIndex];
+                      window.location.href = '/test-run?status=' + encodeURIComponent(label);
+                    }
+                  },
+                  onHover: (event, chartElement) => {
+                    event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                  },
                   plugins: {
                     legend: {
                       position: 'bottom',

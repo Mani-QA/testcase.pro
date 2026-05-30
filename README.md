@@ -2,14 +2,47 @@
 
 A production-ready Test Case Management System built with Hono, Cloudflare Workers, and D1.
 
-## Features
+## Functional Features
 
-- **Dashboard**: Overview with charts and statistics
-- **Test Plan**: Organize test cases in folders, CRUD operations
-- **Test Run**: Create test suites and execute tests
-- **Reports**: Analytics and insights
-- **Authentication**: JWT-based auth with secure password hashing
-- **Guest Mode**: View-only access without login
+TestCase Pro provides a robust, high-performance edge ecosystem for full QA lifecycles:
+
+*   **Requirements Tracking**: Comprehensive user story management module where QA teams can track features, organize them by status (`Open`, `In Progress`, `Implemented`, `Closed`), and map them to their corresponding verification test cases.
+*   **AI-Powered Test Case Generation**: Harnesses Cloudflare Workers AI with `@cf/meta/llama-3-8b-instruct` to automatically generate deep QA test suites (complete with titles, intent description, preconditions, priority, and step-by-step actions/expected outcomes) directly from a user story.
+*   **Deduplication & Regeneration Algorithm**: Sophisticated database synchronizer that maps newly regenerated AI test cases against existing entries. It updates matches, inserts fresh validations, and safely prunes obsolete records sequentially.
+*   **Real-time SSE Progress Tracker**: Highly interactive glassy progress modal overlay that streams progress milestones via fetch streaming and Server-Sent Events (SSE) (Reading User Stories -> Figuring out scenarios -> Creating/Writing Test Cases).
+*   **Dashboard Telemetry**: High-level overview displaying Total Test Cases, Total Requirements, Test Suites, and Test Runs. Renders beautiful interactive Doughnut and Line charts displaying test outcomes and execution trends over 30 days.
+*   **Test Plan Repository**: Organize test cases into tree folder directories, supporting manual case drafting, tag assignments, inline CSV exports, and CSV imports in bulk.
+*   **Test Execution & Audits**: Create suites, assign execution tasks to QA team members, perform step-by-step test runs, and record results (`Passed`, `Failed`, `Blocked`, `Hold`).
+*   **Guest Mode Access**: Secure JWT cookies handling session roles, protecting CRUD mutations while enabling view-only permissions for guest stakeholders.
+
+---
+
+## User Guide
+
+Follow these steps to track requirements and generate test cases with AI:
+
+### 1. Creating a Requirement
+1.  Navigate to the live site and log in with your QA credentials (e.g. `admin@testcasepro.com` / `admin123`).
+2.  Click the **Requirements** tab in the sidebar navigation.
+3.  Click **New Story** to open the creation modal.
+4.  Enter the **Title** (e.g. `As a customer, I can reset my password securely`) and the **Acceptance Criteria** in the description.
+5.  Select the initial status as `Open` and click **Create**. The requirement will be saved and formatted sequentially as `REQ-001`.
+
+### 2. Generating Test Cases with Workers AI
+1.  On the newly created requirement row, click the blue **Generate** button.
+2.  In the AI configuration dialog, optionally select a target **Test Suite/Folder** from your project tree.
+3.  Click **Generate Scenarios** to start the Workers AI pipeline.
+4.  A glassy modal loader overlay will appear showing the real-time progress stream:
+    *   `[x] Reading User Stories`
+    *   `[x] Figuring out test scenarios`
+    *   `[/] Creating Test Cases (4/6)`
+5.  Once the stream signals completion, the loader will automatically close and refresh the view, instantly showing the 6 linked test cases in your repository!
+
+### 3. Reviewing and Running Test Cases
+1.  Navigate to **Test Plan** to view the full descriptions, preconditions, and step-by-step actions/expected results created by the AI.
+2.  Create a **Test Run**, execute each step, mark them `Passed` or `Failed`, and view the outcomes update dynamically on your **Dashboard**!
+
+---
 
 ## Tech Stack
 
@@ -227,6 +260,75 @@ This application implements aggressive edge caching to minimize Cloudflare Worke
 
 Note: The Cloudflare Cache API works differently in local development (wrangler dev). To fully test caching behavior, deploy to Cloudflare Workers staging environment.
 
+## Architecture Information
+
+TestCase Pro leverages a modern, single-worker edge server architecture to achieve near-zero latency and high scalability:
+
+### 1. Single-Worker Pipeline
+Both the frontend server-side rendered pages (built with Hono JSX) and the REST JSON APIs are compiled and deployed within a single Cloudflare Worker. This eliminates the need for separate hosting platforms, eliminates CORS complexity, and keeps bundles extremely light.
+
+### 2. Database Schema Relationships
+Our SQLite database is powered by Cloudflare D1 and mapped with Drizzle ORM.
+*   **Many-to-Many Linking**: A junction table `test_case_requirements` maps test cases to requirements. It sets a composite unique index on `[testCaseId, requirementId]` to prevent duplicates, with `onDelete: 'cascade'` to auto-prune links on deletes.
+*   **One-to-Many Steps**: `test_case_steps` maps individual action/outcome steps to a single `testCaseId`.
+*   **One-to-Many Folders**: `folders` references a self-referential `parentId` to enable nested directory configurations.
+
+```mermaid
+erDiagram
+    users ||--o{ test_cases : author
+    folders ||--o{ test_cases : organizes
+    test_cases ||--o{ test_case_steps : contains
+    requirements ||--o{ test_case_requirements : maps
+    test_cases ||--o{ test_case_requirements : links
+    
+    requirements {
+        int id PK
+        string reqId UK
+        string title
+        string description
+        string status
+        string createdAt
+    }
+    test_case_requirements {
+        int testCaseId FK
+        int requirementId FK
+    }
+    test_cases {
+        int id PK
+        string title
+        string description
+        string preConditions
+        string priority
+        string status
+        int folderId FK
+    }
+```
+
+### 3. Real-Time Data Flow (SSE Streaming)
+The AI test case generation workflow utilizes HTTP streaming Server-Sent Events (SSE) to update the client in real-time during long-running Worker operations:
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant HonoWorker as Cloudflare Worker (Hono)
+    participant D1 as D1 SQLite DB
+    participant AI as Workers AI (Llama 3)
+    
+    Browser->>HonoWorker: POST /api/requirements/:id/generate-test-cases (with folderId)
+    ActiveKeepAlive-->>Browser: 200 OK (text/event-stream)
+    HonoWorker-->>Browser: Event: {"status": "reading"}
+    HonoWorker->>D1: Query requirement & linked test cases
+    HonoWorker-->>Browser: Event: {"status": "scenarios"}
+    HonoWorker->>AI: Call @cf/meta/llama-3-8b-instruct
+    AI-->>HonoWorker: Return structured JSON array of test cases
+    HonoWorker-->>Browser: Event: {"status": "creating", "current": 1, "total": 6}
+    HonoWorker->>D1: Overwrite steps and map linked Drizzle records sequentially
+    HonoWorker-->>Browser: Event: {"status": "complete"}
+    Browser->>Browser: Close modal loader & refresh page
+```
+
+---
+
 ## API Endpoints
 
 ### Authentication
@@ -263,6 +365,17 @@ Note: The Cloudflare Cache API works differently in local development (wrangler 
 
 ### Dashboard
 - `GET /api/dashboard/stats` - Get dashboard statistics
+
+## Pending Features and Roadmap
+
+The following architectural scaling features are planned for future releases:
+
+1.  **Custom AI Prompt Tuning**: Interface to upload custom prompt templates or compliance files to tailor the generated actions/outcomes.
+2.  **External Syncing (Jira / GitHub)**: Webhook support to automatically pull user stories from Jira or GitHub Issues directly into the Requirements database.
+3.  **Executable Playwright Exporter**: Export the AI-generated steps directly into executable Puppeteer, Playwright, or Cypress Javascript templates.
+4.  **Telemetry Dashboard**: Track Workers AI token expenditures and average generation response times in reports.
+
+---
 
 ## License
 
